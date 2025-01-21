@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark-Web Crawler Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Bootstrap CSS (Add the latest version link) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa; /* Light gray background color */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container mt-4">
+        <h1 class="mb-4">Web Crawler Dashboard</h1>
+
+        <!-- GitHub Link -->
+        <div>
+            <p>This dashboard is powered by Flask and Chart.js. Check out the source code on <a href="https://github.com/thisisdakshasoni">GitHub</a>.</p>
+        </div>
+
+        <form method="post" action="/">
+            <div class="form-group">
+                <label for="user_input_url">Enter URL:</label>
+                <input type="text" class="form-control" id="user_input_url" name="user_input_url" required>
+                <label for="user_input_key"  >Enter Keyword</label>
+                <input type="text" class="form-control" id="user_input_key" name="user_input_key" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Crawl</button>
+        </form>
+
+        <ul class="nav nav-tabs mt-4" id="myTabs">
+            <li class="nav-item">
+                <a class="nav-link active" id="results-tab" data-toggle="tab" href="#results">Results</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="html-tab" data-toggle="tab" href="#html_content">HTML Content</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="website-details-tab" data-toggle="tab" href="#website_details">Website Details</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="performance-metrics-tab" data-toggle="tab" href="#performance_metrics">Performance Metrics</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="text-content-analysis-tab" data-toggle="tab" href="#text_content_analysis">Text Content Analysis</a>
+            </li>
+        </ul>
+
+        <div class="tab-content mt-2">
+            <!-- Results Tab -->
+            <div class="tab-pane fade show active" id="results">
+                <h2 class="mt-3">Results:</h2>
+                <ul>
+                    {% for result in results %}
+                        <li>{{ result }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- HTML Content Tab -->
+            <div class="tab-pane fade" id="html_content">
+                <h2 class="mt-3">HTML Content:</h2>
+                <pre>{{ html_content }}</pre>
+            </div>
+
+            <!-- Website Details Tab -->
+            <div class="tab-pane fade" id="website_details">
+                <h2 class="mt-3">Website Details:</h2>
+                <p><strong>Title:</strong> {{ title }}</p>
+
+                <h3>Meta Tags:</h3>
+                <ul>
+                    {% for tag in meta_tags %}
+                        <li>{{ tag }}</li>
+                    {% endfor %}
+                </ul>
+
+                <h3>Links:</h3>
+                <ul>
+                    {% for link in links %}
+                        <li>{{ link }}</li>
+                    {% endfor %}
+                </ul>
+
+                <h3>Images:</h3>
+                <ul>
+                    {% for image in images %}
+                        <li>{{ image }}</li>
+                    {% endfor %}
+                </ul>
+
+                <h2>Text Content:</h2>
+                <p>{{ text_content }}</p>
+
+                <h2>Social Media Tags:</h2>
+                <ul>
+                    {% for property, content in social_media_tags.items() %}
+                        <li><strong>{{ property }}</strong>: {{ content }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Performance Metrics Tab -->
+            <div class="tab-pane fade" id="performance_metrics">
+                <h2 class="mt-3">Performance Metrics:</h2>
+                <p><strong>Duration:</strong> {{ duration }}</p>
+            </div>
+
+            <!-- Text Content Analysis Tab -->
+            <div class="tab-pane fade" id="text_content_analysis">
+                <h2 class="mt-3">Text Content Analysis:</h2>
+                <p><strong>Polarity:</strong> {{ polarity }}</p>
+                <p><strong>Subjectivity:</strong> {{ subjectivity }}</p>
+            </div>
+        </div>
+
+        <!-- Interactive Visualization Tab -->
+        <h2 class="mt-3">Interactive Visualization - Keyword Frequency:</h2>
+        <canvas id="keywordChart" width="400" height="200"></canvas>
+
+        <script>
+            var keywordData = {
+                labels: {{ keyword_occurrence_keys|tojson }},
+                datasets: [{
+                    label: 'Keyword Frequency',
+                    data: {{ keyword_occurrence_values|tojson }},
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            };
+
+            var ctx = document.getElementById('keywordChart').getContext('2d');
+            var myBarChart = new Chart(ctx, {
+                type: 'bar',
+                data: keywordData,
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        </script>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js (Add the latest version links) -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</body>
+</html>

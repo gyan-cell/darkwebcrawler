@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login</title>
+  </head>
+  <body>
+    <form action="{{ url_for('login') }}" method="POST">
+      <h1>Login</h1>
+      <input id="username" name="username" type="text" placeholder="Username"   />
+      <input id="password" name="password" type="password" placeholder="Password" />
+      <button type="submit">Login</button>
+      <a href="{{ url_for('register') }}">Register</a>
+    </form>
+  </body>
+</html>
