@@ -4,10 +4,76 @@ import requests
 from bs4 import BeautifulSoup
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
 from textblob import TextBlob
+import ibm_db
 
 app = Flask(__name__)
 
 TOR_PROXY = {"http": "socks5h://localhost:9050", "https": "socks5h://127.0.0.1:9050"}
+
+
+# IBM Db2 configuration
+DB2_DATABASE = "bludb"
+DB2_HOSTNAME = "21fecfd8-47b7-4937-840d-d791d0218660.bs2io90l08kqb1od8lcg.databases.appdomain.cloud"
+DB2_PORT = "31864"
+DB2_UID = "mvg73722"
+DB2_PWD = "fELvh99ikevEUAk3"
+DB2_PROTOCOL = "TCPIP"
+DB2_DRIVER = "IBM DB2 ODBC DRIVER"
+DB2_SECURITY = "SSL"
+
+
+clientId = "cc1146fc-d1d5-43bc-9aa0-898c84707582"
+tenantId = "37e46843-2380-412b-864d-d0ca533d3e8c"
+secret = "NjUxMGJlNDQtYWQzNy00N2ZlLWI1NzItZDEyMjg0NmVkN2Y4"
+oAuthServerUrl = (
+    "https://au-syd.appid.cloud.ibm.com/oauth/v4/37e46843-2380-412b-864d-d0ca533d3e8c"
+)
+profilesUrl = "https://au-syd.appid.cloud.ibm.com"
+discoveryEndpoint = "https://au-syd.appid.cloud.ibm.com/oauth/v4/37e46843-2380-412b-864d-d0ca533d3e8c/.well-known/openid-configuration"
+
+
+DB2_CONN_STR = (
+    f"DATABASE={DB2_DATABASE};"
+    f"HOSTNAME={DB2_HOSTNAME};"
+    f"PORT={DB2_PORT};"
+    f"PROTOCOL=TCPIP;"
+    f"UID={DB2_UID};"
+    f"PWD={DB2_PWD};"
+)
+
+dsn = (
+    "DRIVER={0};"
+    "DATABASE={1};"
+    "HOSTNAME={2};"
+    "PORT={3};"
+    "PROTOCOL={4};"
+    "UID={5};"
+    "PWD={6};"
+    "SECURITY={7};"
+).format(
+    DB2_DRIVER,
+    DB2_DATABASE,
+    DB2_HOSTNAME,
+    DB2_PORT,
+    DB2_PROTOCOL,
+    DB2_UID,
+    DB2_PWD,
+    DB2_SECURITY,
+)
+
+try:
+    conn = ibm_db.connect(dsn, "", "")
+    print(
+        "Connected to database: ",
+        DB2_DATABASE,
+        "as user: ",
+        DB2_UID,
+        "on host: ",
+        DB2_HOSTNAME,
+    )
+
+except:
+    print("Unable to connect: ", ibm_db.conn_errormsg())
 
 
 def count_keyword_occurrences(html_content, keyword):
@@ -69,6 +135,31 @@ def perform_web_crawl(url, keyword):
     }
 
 
+def store_in_db2(data):
+    try:
+        conn = ibm_db.connect(dsn, "", "")
+        sql = """
+        INSERT INTO WEB_CRAWL_DATA (
+            URL, TITLE, KEYWORD_COUNT, LINKS, IMAGES, DURATION, POLARITY, SUBJECTIVITY, SOCIAL_MEDIA_TAGS
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """
+        stmt = ibm_db.prepare(conn, sql)
+        ibm_db.bind_param(stmt, 1, data["url"])
+        ibm_db.bind_param(stmt, 2, data["title"])
+        ibm_db.bind_param(stmt, 3, data["keyword_count"])
+        ibm_db.bind_param(stmt, 4, str(data["links"]))
+        ibm_db.bind_param(stmt, 5, str(data["images"]))
+        ibm_db.bind_param(stmt, 6, data["duration"])
+        ibm_db.bind_param(stmt, 7, data["polarity"])
+        ibm_db.bind_param(stmt, 8, data["subjectivity"])
+        ibm_db.bind_param(stmt, 9, str(data["social_media_tags"]))
+        ibm_db.execute(stmt)
+        ibm_db.close(conn)
+        print(f"Data stored in Db2 for URL: {data['url']}")
+    except Exception as e:
+        print(f"Error storing data in Db2: {e}")
+
+
 def search_ahmia(keyword):
     search_url = f"https://ahmia.fi/search/?q={keyword}"
     try:
@@ -77,7 +168,6 @@ def search_ahmia(keyword):
         soup = BeautifulSoup(res.text, "html.parser")
         for anchor in soup.find_all("a", href=True):
             links.append(anchor["href"])
-        print("The second rs is", links)
         return [
             link.get("href")
             for link in soup.find_all("a", href=True)
@@ -105,6 +195,9 @@ def index():
                 crawled_data = list(
                     executor.map(lambda url: perform_web_crawl(url, keyword), urls)
                 )
+
+            for data in crawled_data:
+                store_in_db2(data)
 
         return render_template(
             "newdash.html",
@@ -136,5 +229,5 @@ def register():
 
 if __name__ == "__main__":
 
-    app.secret_key = "super secret key Super Nigga 69 jhbvfjhbkvbfduyvgueyrlybvuyrbyubverbuyuyybveiunvuibveb"
+    app.secret_key = "super secret key Super Nigga 69 , Jai Brahmanwad ,  jhbvfjhbkvbfduyvgueyrlybvuyrbyubverbuyuyybveiunvuibveb"
     app.run(debug=True, port=5510)
