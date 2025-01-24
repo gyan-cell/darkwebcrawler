@@ -1,0 +1,7 @@
+ibm-db
+requests
+beautifulsoup4
+flask
+textblob
+pysocks
+ibm-nlu
