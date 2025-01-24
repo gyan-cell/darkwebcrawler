@@ -11,7 +11,11 @@ app = Flask(__name__)
 TOR_PROXY = {"http": "socks5h://localhost:9050", "https": "socks5h://127.0.0.1:9050"}
 
 
-# IBM Db2 configuration
+# IBM Watson NLU URL and API Key
+url = "https://api.us-south.natural-language-understanding.watson.cloud.ibm.com/instances/YOUR_INSTANCE_ID"
+api_key = "YOUR_API_KEY"
+
+
 DB2_DATABASE = "bludb"
 DB2_HOSTNAME = "21fecfd8-47b7-4937-840d-d791d0218660.bs2io90l08kqb1od8lcg.databases.appdomain.cloud"
 DB2_PORT = "31864"
