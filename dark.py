@@ -12,8 +12,8 @@ TOR_PROXY = {"http": "socks5h://localhost:9050", "https": "socks5h://127.0.0.1:9
 
 
 # IBM Watson NLU URL and API Key
-url = "https://api.us-south.natural-language-understanding.watson.cloud.ibm.com/instances/YOUR_INSTANCE_ID"
-api_key = "YOUR_API_KEY"
+url = "https://api.au-syd.natural-language-understanding.watson.cloud.ibm.com/instances/3fb1ae40-a0d1-471c-b276-529079543d07"
+api_key = "0bOh_-bbt8DimU2Em7ccfVaKcsQUPpkmzGsv2SDYud-g"
 
 
 DB2_DATABASE = "bludb"
