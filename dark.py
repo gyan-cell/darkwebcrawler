@@ -184,54 +184,31 @@ def search_ahmia(keyword):
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    if session.get("username") == False or session.get("username") == None:
-        print(session)
-        return redirect("/login")
-    else:
-        crawled_data = []
-        keyword = ""
+    crawled_data = []
+    keyword = ""
 
-        if request.method == "POST":
-            keyword = request.form["keyword"]
-            urls = search_ahmia(keyword)
-
-            with ThreadPoolExecutor(max_workers=5) as executor:
-                crawled_data = list(
-                    executor.map(lambda url: perform_web_crawl(url, keyword), urls)
-                )
-
-            for data in crawled_data:
-                store_in_db2(data)
-
-        return render_template(
-            "newdash.html",
-            crawled_data=crawled_data,
-            keyword=keyword,
-            username=session.get("username"),
-        )
-
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
     if request.method == "POST":
-        therealusername = "gyanranjan"
-        therealpassword = "gyanranjan"
-        username = request.form["username"].lower()
-        password = request.form["password"].lower()
-        if username == therealusername and password == therealpassword:
-            print(username, password)
-            session["username"] = username
-            flash("Login successful!")
-            return redirect("/")
-    return render_template("login.html")
+        keyword = request.form["keyword"]
+        urls = search_ahmia(keyword)
 
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            crawled_data = list(
+                executor.map(lambda url: perform_web_crawl(url, keyword), urls)
+            )
 
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    return render_template("register.html")
+        for data in crawled_data:
+            store_in_db2(data)
+
+    return render_template(
+        "newdash.html",
+        crawled_data=crawled_data,
+        keyword=keyword,
+    )
 
 
 if __name__ == "__main__":
 
-    app.secret_key = "super secret key Super Nigga 69 , Jai Brahmanwad ,  jhbvfjhbkvbfduyvgueyrlybvuyrbyubverbuyuyybveiunvuibveb"
+    app.secret_key = (
+        "super secret key Super jhbvfjhbkvbfduyvgueyrlybvuyrbyubverbuyuyybveiunvuibveb"
+    )
     app.run(debug=True, port=5510)
